@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'screens/auth_gate.dart';
-import 'screens/deals_feed_screen.dart';
+import 'screens/main_navigation_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +22,7 @@ class DealsOnWheelsApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: AuthGate(child: DealsFeedScreen()),
+      home: AuthGate(),
     );
   }
 }

@@ -37,8 +37,24 @@ class _AuthScreenState extends State<AuthScreen> {
       if (isSignUp) {
         final response = await auth.signUp(email: email, password: password);
         if (response.user != null) {
-          // Save city to profile
-          await UserProfileService.setCity(response.user!.id, _selectedCity!);
+          try {
+            // Wait a moment for the session to be established
+            await Future.delayed(Duration(milliseconds: 500));
+            
+            // Save city to profile
+            print('DEBUG: Creating profile for user ${response.user!.id} with city $_selectedCity');
+            await UserProfileService.setCity(response.user!.id, _selectedCity!);
+            print('DEBUG: Profile created successfully');
+          } catch (e) {
+            print('DEBUG: Error creating profile: $e');
+            // Don't fail the sign-up, just show a warning
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Account created but city save failed. Please set your city in profile.'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Sign up successful! Please check your email to confirm.')),
           );
@@ -60,7 +76,11 @@ class _AuthScreenState extends State<AuthScreen> {
       }
     } on AuthException catch (e) {
       setState(() {
-        _error = e.message;
+        if (e.message.contains('rate limit')) {
+          _error = 'Email rate limit exceeded. Please use a different email or wait a few minutes.';
+        } else {
+          _error = e.message;
+        }
       });
     } finally {
       setState(() {
